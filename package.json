@@ -7,7 +7,7 @@
     "ligar": "node index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "lynn-nova",
   "license": "UNLICENSED",
   "type": "commonjs",
   "dependencies": {

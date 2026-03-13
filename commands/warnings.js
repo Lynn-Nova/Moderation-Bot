@@ -1,6 +1,12 @@
 /**
  * @file warnings.js
- * @description Sistema de advertências.
+ * @description Sistema de advertências com persistência em MongoDB.
+ *
+ * Este comando demonstra dois fluxos clássicos de moderação:
+ * 1. registrar uma nova advertência de forma auditável;
+ * 2. consultar o histórico completo de um membro.
+ *
+ * A lógica fica isolada neste módulo para manter o ficheiro principal do bot focado apenas em bootstrap, eventos globais e carregamento de comandos.
  */
 
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, MessageFlags } = require('discord.js');
@@ -26,19 +32,23 @@ module.exports = {
         const target = interaction.options.getUser('alvo');
         const guildId = interaction.guild.id;
 
+        // Cada subcomando reaproveita o mesmo ponto de entrada para evitar dois ficheiros quase iguais. Isso reduz repetição e facilita manutenção.
         if (sub === 'add') {
             const reason = interaction.options.getString('motivo');
 
+            /**
+             * findOneAndUpdate com $push permite registrar o aviso em uma única operação. Com upsert: true, o documento é criado caso o membro ainda não tenha histórico, eliminando a necessidade de uma busca prévia seguida de create/save.
+             */
             const userData = await GuildUser.findOneAndUpdate(
                 { guildId: guildId, userId: target.id },
-                { 
-                    $push: { 
-                        warnings: { 
-                            moderatorId: interaction.user.id, 
+                {
+                    $push: {
+                        warnings: {
+                            moderatorId: interaction.user.id,
                             reason: reason,
-                            date: new Date() 
-                        } 
-                    } 
+                            date: new Date()
+                        }
+                    }
                 },
                 { upsert: true, new: true }
             );
@@ -54,6 +64,9 @@ module.exports = {
                 .setTimestamp();
 
             try {
+                /**
+                 * A DM é opcional do ponto de vista técnico. O sistema principal não depende dela para funcionar, então a falha é tratada sem interromper o comando. Isso evita erro visível quando o membro está com mensagens privadas desativadas.
+                 */
                 const dmEmbed = new EmbedBuilder()
                     .setTitle('⚠️ Você recebeu uma advertência')
                     .setDescription(`${target.username} você recebeu uma advertência no servidor **${interaction.guild.name}**.`)
@@ -75,14 +88,17 @@ module.exports = {
         if (sub === 'list') {
             const userData = await GuildUser.findOne({ guildId: guildId, userId: target.id });
 
+            // Esta guarda evita construir embed vazio e deixa a resposta mais clara para a equipe de moderação quando o membro ainda não possui histórico.
             if (!userData || !userData.warnings || userData.warnings.length === 0) {
-                return interaction.reply({ 
-                    content: `O Membro ${target.tag} não possui advertências.`, 
-                    flags: MessageFlags.Ephemeral 
+                return interaction.reply({
+                    content: `O Membro ${target.tag} não possui advertências.`,
+                    flags: MessageFlags.Ephemeral
                 });
             }
 
-            // Mapear as advertências para uma string legível
+            /**
+             * O index começa em 1 para o moderador, porque IDs são mais intuitivos do que index baseados em 0. Já a data é convertida para timestamp do Discord, permitindo renderização local conforme idioma e fuso horário do utilizador que vizualiza a embed.
+             */
             const listEmbed = new EmbedBuilder()
                 .setTitle(`Avisos de: ${target.username}`)
                 .setColor('Red')
