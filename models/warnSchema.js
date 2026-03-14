@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @file warnSchema.js
  * @description Schema alternativo para armazenar advertências por servidor e usuário.
@@ -87,3 +88,14 @@ warnSchema.methods.removeWarningByIndex = function (index) {
 };
 
 module.exports = mongoose.model('warnSchema', warnSchema);
+=======
+const mongoose = require('mongoose');
+
+const warnSchema = new mongoose.Schema({
+    GuildID: { type: String, required: true },
+    UserID: { type: String, required: true },
+    Content: { type: Array, required: true },
+});
+
+module.exports = mongoose.model('warnSchema', warnSchema);
+>>>>>>> 91068e0 (Correção de comentários)

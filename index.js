@@ -1,8 +1,12 @@
 /**
  * @file index.js
+<<<<<<< HEAD
  * @description Ponto de entrada do bot.
  * 
  * Responsável pelo ciclo de arranque da aplicação: carregar variáveis de ambiente, iniciar o client, conectar-se ao MongoDB, verificar comandos automaticamente e reagir às interações em tempo real.
+=======
+ * @description Ponto de entrada do bot. Implementa o carregamento dinâmico de módulos e a gestão de eventos de interação.
+>>>>>>> 91068e0 (Correção de comentários)
  */
 
 require('dotenv').config();
@@ -26,15 +30,22 @@ mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('🍃 Conectado ao MongoDB!'))
     .catch(err => console.error('❌ Não foi possivel conectar ao MongoDB:', err));
 
+<<<<<<< HEAD
 // A função do Collection é ser um repositório em memória para despachar comandos sem precisar de múltiplos if/else ou switch gigantes no evento.
 client.commands = new Collection();
 
+=======
+client.commands = new Collection();
+
+// Carregamento de comandos
+>>>>>>> 91068e0 (Correção de comentários)
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
     const command = require(filePath);
+<<<<<<< HEAD
 
     /**
      * Registra apenas módulos que seguem o contrato esperado pelo bot:
@@ -43,6 +54,8 @@ for (const file of commandFiles) {
      * 
      * Esta validação impede que ficheiros auxiliares na pasta commands causem erro de execução no momento do bootstrap
      */
+=======
+>>>>>>> 91068e0 (Correção de comentários)
     
     if ('data' in command && 'execute' in command) {
         client.commands.set(command.data.name, command);
@@ -52,7 +65,11 @@ for (const file of commandFiles) {
 
 client.on('interactionCreate', async interaction => {
     
+<<<<<<< HEAD
     // Primeiro fluxo: comandos slash tradicionais
+=======
+    // Comandos Slash
+>>>>>>> 91068e0 (Correção de comentários)
     if (interaction.isChatInputCommand()) {
         const command = client.commands.get(interaction.commandName);
         if (!command) return;
@@ -68,7 +85,11 @@ client.on('interactionCreate', async interaction => {
         }
     }
 
+<<<<<<< HEAD
     // Segundo fluxo: botão do sistema de tickets
+=======
+    // Botão para abrir ticket
+>>>>>>> 91068e0 (Correção de comentários)
     if (interaction.isButton() && interaction.customId === 'open_ticket') {
         try {
             const userData = await GuildUser.findOne({ guildId: interaction.guild.id, userId: interaction.user.id });
@@ -80,10 +101,13 @@ client.on('interactionCreate', async interaction => {
                         content: `Você já possui um ticket aberto em ${existingChannel}!`, 
                         flags: MessageFlags.Ephemeral 
                     });
+<<<<<<< HEAD
 
                     /**
                      * Antes de criar um novo canal, o bot verifica se já existe ticket ativo associado ao utilizador. Isso evita duplicidade de canais, desorganização no suporte e abuso do sistema por spam de cliques.
                      */
+=======
+>>>>>>> 91068e0 (Correção de comentários)
                 }
             }
 
@@ -97,7 +121,10 @@ client.on('interactionCreate', async interaction => {
                 ]
             });
 
+<<<<<<< HEAD
             // O upsert garante que o registro do utilizador exista mesmo que seja o primeuiro contato dele com qualquer sistema do bot.
+=======
+>>>>>>> 91068e0 (Correção de comentários)
             await GuildUser.findOneAndUpdate(
                 { guildId: interaction.guild.id, userId: interaction.user.id },
                 { activateTicket: channel.id },
@@ -116,6 +143,10 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
+<<<<<<< HEAD
+=======
+// Sincronização
+>>>>>>> 91068e0 (Correção de comentários)
 client.once('clientReady', async () => {
     console.log(`${client.user.tag} está online!`);
     
@@ -123,9 +154,12 @@ client.once('clientReady', async () => {
     const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
     try {
+<<<<<<< HEAD
         /**
          * A sincronização envia ao Discord a definição atual dos slash commands. Sem a existência dessa etapa, alterações locais como novos subcomandos ou descrições não apareceriam na interface do usuário.
          */
+=======
+>>>>>>> 91068e0 (Correção de comentários)
         console.log(`⌛ Sincronizando ${commandsData.length} comandos...`);
         await rest.put(
             Routes.applicationCommands(client.user.id, '1304927459363393566'),

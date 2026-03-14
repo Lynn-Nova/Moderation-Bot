@@ -18,12 +18,16 @@ module.exports = {
         const channel = interaction.channel;
         const guildId = interaction.guild.id;
 
+<<<<<<< HEAD
         // Procura o dono do ticket usando o canal como referência. O campo activateTicket liga o usuário ao canal privado aberto para suporte.
+=======
+>>>>>>> 91068e0 (Correção de comentários)
         const userData = await GuildUser.findOne({ guildId: guildId, activateTicket: channel.id });
 
         // Se não existir registro no banco de dados, o comando ainda pode funcionar em tickets manuais. Nesse caso, usamos o nome do canal como fallback e restringimos a ação a moderadores.
         if (!userData) {
             if (!channel.name.startsWith('ticket-')) {
+<<<<<<< HEAD
                 return interaction.reply({
                     content: 'Esse canal não é um ticket registrado no sistema.',
                     flags: MessageFlags.Ephemeral,
@@ -43,6 +47,21 @@ module.exports = {
         const isOwner = userData?.userId === interaction.user.id;
 
         // Moderadores com ManageChannels também podem encerrar tickets.
+=======
+                return interaction.reply({ 
+                    content: 'Esse canal não é um ticket registrado no sistema.', 
+                    flags: MessageFlags.Ephemeral 
+                });
+            }
+            // Se o canal não estiver na Database o moderador poderá deletar
+            if (!interaction.member.permissions.has(PermissionFlagsBits.ManageChannels)) {
+                return interaction.reply({ content: 'Apenas moderadores podem fechar tickets não registrados.', flags: MessageFlags.Ephemeral });
+            }
+        }
+
+        // Verificação de permissões
+        const isOwner = userData?.userId === interaction.user.id;
+>>>>>>> 91068e0 (Correção de comentários)
         const isMod = interaction.member.permissions.has(PermissionFlagsBits.ManageChannels);
 
         // Caso não seja dono nem moderador, a ação é bloqueada. Isso protege o ticket contra fechamento indevido por terceiros.
@@ -54,6 +73,7 @@ module.exports = {
         }
 
         try {
+<<<<<<< HEAD
             // Antes de apagar o canal, O vínculo no banco de dados é removido. Isso evita que o usuário fique marcado como se ainda tivesse um ticket aberto.
             if (userData) {
                 await GuildUser.findOneAndUpdate(
@@ -68,6 +88,19 @@ module.exports = {
             // O atraso curto dá tempo para a mensagem ser lida antes da exclusão do canal.
             setTimeout(async () => {
                 await channel.delete().catch(err => console.error('Erro ao apagar canal:', err));
+=======
+            if (userData) {
+                await GuildUser.findOneAndUpdate(
+                    { guildId: guildId, userId: userData.userId },
+                    { $unset: { activateTicket: "" } }
+                );
+            }
+
+            await interaction.reply('🔒 O ticket será fechado e deletado em 5 segundos...');
+
+            setTimeout(async () => {
+                await channel.delete().catch(err => console.error("Erro ao apagar canal:", err));
+>>>>>>> 91068e0 (Correção de comentários)
             }, 5000);
         } catch (error) {
             console.error('Erro ao fechar ticket:', error);

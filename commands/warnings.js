@@ -64,9 +64,12 @@ module.exports = {
                 .setTimestamp();
 
             try {
+<<<<<<< HEAD
                 /**
                  * A DM é opcional do ponto de vista técnico. O sistema principal não depende dela para funcionar, então a falha é tratada sem interromper o comando. Isso evita erro visível quando o membro está com mensagens privadas desativadas.
                  */
+=======
+>>>>>>> 91068e0 (Correção de comentários)
                 const dmEmbed = new EmbedBuilder()
                     .setTitle('⚠️ Você recebeu uma advertência')
                     .setDescription(`${target.username} você recebeu uma advertência no servidor **${interaction.guild.name}**.`)
@@ -88,6 +91,7 @@ module.exports = {
         if (sub === 'list') {
             const userData = await GuildUser.findOne({ guildId: guildId, userId: target.id });
 
+<<<<<<< HEAD
             // Esta guarda evita construir embed vazio e deixa a resposta mais clara para a equipe de moderação quando o membro ainda não possui histórico.
             if (!userData || !userData.warnings || userData.warnings.length === 0) {
                 return interaction.reply({
@@ -99,6 +103,16 @@ module.exports = {
             /**
              * O index começa em 1 para o moderador, porque IDs são mais intuitivos do que index baseados em 0. Já a data é convertida para timestamp do Discord, permitindo renderização local conforme idioma e fuso horário do utilizador que vizualiza a embed.
              */
+=======
+            if (!userData || !userData.warnings || userData.warnings.length === 0) {
+                return interaction.reply({ 
+                    content: `O Membro ${target.tag} não possui advertências.`, 
+                    flags: MessageFlags.Ephemeral 
+                });
+            }
+
+            // Mapear as advertências para uma string legível
+>>>>>>> 91068e0 (Correção de comentários)
             const listEmbed = new EmbedBuilder()
                 .setTitle(`Avisos de: ${target.username}`)
                 .setColor('Red')
