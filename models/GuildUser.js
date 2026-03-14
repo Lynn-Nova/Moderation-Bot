@@ -29,7 +29,7 @@ const UserSchema = new mongoose.Schema({
 	// ID do canal se o membro tiver um ticket aberto.
 	activeTickets: { type: String, default: null },
 
-	// Petmite bloquear usuários de certas funções sem precisar banir-los
+	// Permite bloquear usuários de certas funções sem precisar banir-los
 	isBlacklisted: { type: Boolean, default: false },
 })
 
